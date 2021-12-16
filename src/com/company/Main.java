@@ -189,6 +189,11 @@ class Contacts {
         return number;
     }
 
+    private String scanAddress() {
+        System.out.println("Enter the address:");
+        return scanner.nextLine();
+    }
+
     private void addContact() {
         System.out.println("Enter the type (person, organization):");
         String type = scanner.nextLine();
@@ -196,15 +201,15 @@ class Contacts {
         switch (type) {
             case "person":
                 ContactField contactPerson = new ContactPerson.Builder().setName(scanName())
-                               .setSurname(scanSurname())
-                               .setNumber(scanNumber())
-                               .build();
+                        .setSurname(scanSurname())
+                        .setNumber(scanNumber())
+                        .build();
                 contactArrayList.add(contactPerson);
                 System.out.println("The record added.");
                 break;
             case "organization":
                 ContactField contactCompany = new ContactCompany.Builder().setName(scanName())
-                        .setAddress(scanSurname())
+                        .setAddress(scanAddress())
                         .setNumber(scanNumber())
                         .build();
                 contactArrayList.add(contactCompany);
@@ -212,6 +217,7 @@ class Contacts {
                 break;
             default:
                 System.out.println("Unknown action");
+        }
     }
 
     private void countContacts() {
