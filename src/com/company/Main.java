@@ -5,23 +5,12 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Contact {
-    private String name;
-    private String surname;
-    private String number;
-
-    private Contact(String name, String surname, String number) {
-        this.name = name;
-        this.surname = surname;
-        this.number = number;
-    }
+abstract class ContactField {
+    String name;
+    String number;
 
     public String getName() {
         return name;
-    }
-
-    public String getSurname() {
-        return surname;
     }
 
     public String getNumber() {
@@ -30,6 +19,20 @@ class Contact {
 
     public boolean hasNumber() {
         return !number.equals("") && !number.equals("[no number]");
+    }
+}
+
+class ContactPerson extends ContactField {
+    private String surname;
+
+    private ContactPerson(String name, String surname, String number) {
+        this.name = name;
+        this.surname = surname;
+        this.number = number;
+    }
+
+    public String getSurname() {
+        return surname;
     }
 
     @Override
@@ -55,10 +58,10 @@ class Contact {
         Builder() {
         }
 
-        Builder(Contact contact) {
-            this.name = contact.getName();
-            this.surname = contact.getSurname();
-            this.number = contact.getNumber();
+        Builder(ContactPerson contactPerson) {
+            this.name = contactPerson.getName();
+            this.surname = contactPerson.getSurname();
+            this.number = contactPerson.getNumber();
         }
 
         Builder setName(String name) {
@@ -76,8 +79,73 @@ class Contact {
             return this;
         }
 
-        Contact build() {
-            return new Contact(name, surname, number);
+        ContactPerson build() {
+            return new ContactPerson(name, surname, number);
+        }
+
+    }
+
+}
+
+class ContactCompany extends ContactField {
+    private String address;
+
+    private ContactCompany(String name, String address, String number) {
+        this.name = name;
+        this.address = address;
+        this.number = number;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        if (name != null) {
+            str += name;
+        }
+        if (address != null) {
+            str += " " + address;
+        }
+        if (number != null) {
+            str +=", " + number;
+        }
+        return str;
+    }
+
+    static class Builder {
+        private String name = "";
+        private String address = "";
+        private String number = "";
+
+        Builder() {
+        }
+
+        Builder(ContactCompany contactCompany) {
+            this.name = contactCompany.getName();
+            this.address = contactCompany.getAddress();
+            this.number = contactCompany.getNumber();
+        }
+
+        ContactCompany.Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        ContactCompany.Builder setAddress(String surname) {
+            this.address = address;
+            return this;
+        }
+
+        ContactCompany.Builder setNumber(String number) {
+            this.number = number;
+            return this;
+        }
+
+        ContactCompany build() {
+            return new ContactCompany(name, address, number);
         }
 
     }
@@ -85,12 +153,12 @@ class Contact {
 }
 
 class Contacts {
-    private ArrayList<Contact> contactArrayList;
+    private ArrayList<ContactField> contactArrayList;
     private Scanner scanner = new Scanner(System.in);
 
 
     public Contacts() {
-        contactArrayList = new ArrayList<Contact>();
+        contactArrayList = new ArrayList<ContactField>();
     }
 
     private boolean validateNumber(String number) {
@@ -122,14 +190,28 @@ class Contacts {
     }
 
     private void addContact() {
-        Contact contact = new Contact.Builder().setName(scanName())
-                        .setSurname(scanSurname())
+        System.out.println("Enter the type (person, organization):");
+        String type = scanner.nextLine();
+
+        switch (type) {
+            case "person":
+                ContactField contactPerson = new ContactPerson.Builder().setName(scanName())
+                               .setSurname(scanSurname())
+                               .setNumber(scanNumber())
+                               .build();
+                contactArrayList.add(contactPerson);
+                System.out.println("The record added.");
+                break;
+            case "organization":
+                ContactField contactCompany = new ContactCompany.Builder().setName(scanName())
+                        .setAddress(scanSurname())
                         .setNumber(scanNumber())
                         .build();
-
-        contactArrayList.add(contact);
-
-        System.out.println("The record added.");
+                contactArrayList.add(contactCompany);
+                System.out.println("The record added.");
+                break;
+            default:
+                System.out.println("Unknown action");
     }
 
     private void countContacts() {
