@@ -9,6 +9,8 @@ abstract class ContactField {
     String name;
     String number;
 
+    public abstract String toShortString();
+
     public String getName() {
         return name;
     }
@@ -46,6 +48,17 @@ class ContactPerson extends ContactField {
         }
         if (number != null) {
             str +=", " + number;
+        }
+        return str;
+    }
+
+    public String toShortString() {
+        String str = "";
+        if (name != null) {
+            str += name;
+        }
+        if (surname != null) {
+            str += " " + surname;
         }
         return str;
     }
@@ -111,6 +124,14 @@ class ContactCompany extends ContactField {
         }
         if (number != null) {
             str +=", " + number;
+        }
+        return str;
+    }
+
+    public String toShortString() {
+        String str = "";
+        if (name != null) {
+            str += name;
         }
         return str;
     }
@@ -220,57 +241,91 @@ class Contacts {
         }
     }
 
+    private void listContacts() {
+        for (ContactField contact: contactArrayList)
+        {
+            System.out.println((contactArrayList.indexOf(contact) + 1) + ". " + contact.toShortString());
+        }
+    }
+
+    private void removeContact() {
+        if (contactArrayList.isEmpty()) {
+            System.out.println("No records to remove!");
+        } else {
+            ContactField contact = selectContact();
+            contactArrayList.remove(contact);
+            System.out.println("The record removed!");
+        }
+    }
+
     private void countContacts() {
         System.out.println("The Phone Book has " + contactArrayList.size() + " record" +
                 (contactArrayList.size() == 1 ? "." : "s."));
     }
 
-    private void listContacts() {
-        for (Contact contact: contactArrayList)
-        {
-            System.out.println((contactArrayList.indexOf(contact) + 1) + ". " + contact.toString());
-        }
-    }
 
-    private Contact selectContacts() {
+    private ContactField selectContact() {
         listContacts();
         System.out.println("Select a record:");
         return contactArrayList.get(Integer.parseInt(scanner.nextLine())-1);
     }
 
-    private void editContacts() {
+    private void editContact() {
         if (contactArrayList.isEmpty()) {
             System.out.println("No records to edit!");
         } else {
-            Contact contact = selectContacts();
-            System.out.println("Select a field (name, surname, number):");
-            String field = scanner.nextLine();
-            switch (field) {
-                case "name":
-                    contactArrayList.set(contactArrayList.indexOf(contact),
-                            new Contact.Builder(contact).setName(scanName()).build());
-                    break;
-                case "surname":
-                    contactArrayList.set(contactArrayList.indexOf(contact),
-                            new Contact.Builder(contact).setSurname(scanSurname()).build());
-                    break;
-                case "number":
-                    contactArrayList.set(contactArrayList.indexOf(contact),
-                            new Contact.Builder(contact).setNumber(scanNumber()).build());
-                    break;
+            ContactField contact = selectContact();
+            if (contact instanceof ContactPerson) {
+                editContactPerson((ContactPerson) contact);
+            } else {
+                editContactCompany((ContactCompany) contact);
             }
         }
     }
 
-    private void removeContacts() {
-        if (contactArrayList.isEmpty()) {
-            System.out.println("No records to remove!");
-        } else {
-            Contact contact = selectContacts();
-            contactArrayList.remove(contact);
-            System.out.println("The record removed!");
+    private void editContactPerson(ContactPerson contact) {
+        System.out.println("Select a field (name, surname, number):");
+        String field = scanner.nextLine();
+        switch (field) {
+            case "name":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactPerson.Builder(contact).setName(scanName()).build());
+                break;
+
+            case "surname":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactPerson.Builder(contact).setSurname(scanSurname()).build());
+                break;
+            case "number":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactPerson.Builder(contact).setNumber(scanNumber()).build());
+                break;
+            }
+    }
+
+
+    private void editContactCompany(ContactCompany contact) {
+        System.out.println("Select a field (name, address, number):");
+        String field = scanner.nextLine();
+        switch (field) {
+            case "name":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactCompany.Builder(contact).setName(scanName()).build());
+                break;
+
+            case "address":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactCompany.Builder(contact).setAddress(scanAddress()).build());
+                break;
+            case "number":
+                contactArrayList.set(contactArrayList.indexOf(contact),
+                        new ContactCompany.Builder(contact).setNumber(scanNumber()).build());
+                break;
         }
     }
+
+
+
 
     public void loop() {
         loop: while (true) {
@@ -281,10 +336,10 @@ class Contacts {
                     addContact();
                     break;
                 case "remove":
-                    removeContacts();
+                    removeContact();
                     break;
                 case "edit":
-                    editContacts();
+                    editContact();
                     break;
                 case "count":
                     countContacts();
