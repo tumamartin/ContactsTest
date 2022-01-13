@@ -84,12 +84,12 @@ class ContactPerson extends ContactField {
         }
         if (timeCreated != null) {
             str += "Time created: ";
-            str += timeCreated;
+            str += timeCreated.withNano(0);
             str += System.lineSeparator();
         }
         if (timeEdit != null) {
             str += "Time last edit: ";
-            str += timeEdit;
+            str += timeEdit.withNano(0);
         }
         return str;
     }
@@ -207,12 +207,12 @@ class ContactCompany extends ContactField {
         }
         if (timeCreated != null) {
             str += "Time created: ";
-            str += timeCreated;
+            str += timeCreated.withNano(0);
             str += System.lineSeparator();
         }
         if (timeEdit != null) {
             str += "Time last edit: ";
-            str += timeEdit;
+            str += timeEdit.withNano(0);
         }
         return str;
     }
